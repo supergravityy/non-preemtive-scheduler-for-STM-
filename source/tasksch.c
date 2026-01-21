@@ -29,7 +29,8 @@ typedef struct TaskInfo
     volatile bool cycledOnce_flag;
 
     // runtime error
-    uint16_t indiOverRunCnt;
+    volatile uint16_t indiOverRun_totalCnt; 
+    uint16_t indiOverRun_cycleCnt; 
     uint32_t taskCnt;
 } typTaskInfo;
 
@@ -45,8 +46,7 @@ typedef struct SchInfo
     bool majorCycle_flag;
     uint8_t majorCycle_taskExecCnt;
     bool tasksch_Exit_Flag;
-    uint16_t oneCycle_overRun_count;
-    uint16_t total_overRun_count;
+    uint16_t overRun_count;
 } typSchInfo;
 
 #pragma pack(pop)
@@ -85,7 +85,8 @@ static void tasksch_taskConfig(uint8_t taskIdx, uint16_t period_ms, uint16_t off
         vTaskSch_taskList[taskIdx].exec_flag = false;
         vTaskSch_taskList[taskIdx].cycledOnce_flag = false;
         vTaskSch_taskList[taskIdx].taskCnt = 0;
-        vTaskSch_taskList[taskIdx].indiOverRunCnt = 0;
+        vTaskSch_taskList[taskIdx].indiOverRun_totalCnt = 0;
+        vTaskSch_taskList[taskIdx].indiOverRun_cycleCnt = 0;
     }
     else
     {
@@ -162,13 +163,11 @@ static void tasksch_update_majorCycle_infos(void)
     {
         vTaskSch_taskList[i].cycledOnce_flag = false;
         TASKSCH_DISABLE_ISR();
-        vTaskSch_info.oneCycle_overRun_count += vTaskSch_taskList[i].indiOverRunCnt;
-        vTaskSch_taskList[i].indiOverRunCnt = 0;
+        vTaskSch_info.overRun_count += vTaskSch_taskList[i].indiOverRun_cycleCnt;
+        vTaskSch_taskList[i].indiOverRun_totalCnt += vTaskSch_taskList[i].indiOverRun_cycleCnt;
+		vTaskSch_taskList[i].indiOverRun_cycleCnt = 0;
         TASKSCH_ENABLE_ISR();
     }
-
-    vTaskSch_info.total_overRun_count += vTaskSch_info.oneCycle_overRun_count;
-    vTaskSch_info.oneCycle_overRun_count = 0;
 }
 
 static void tasksch_majorCycleEvent(void)
@@ -269,20 +268,20 @@ uint16_t tasksch_getOverRunCount(void)
 {
     uint16_t tempOverrunCnt = 0;
 
-    tempOverrunCnt = vTaskSch_info.total_overRun_count;
+    tempOverrunCnt = vTaskSch_info.overRun_count;
 
     return tempOverrunCnt;
 }
 
 static inline void tasksch_clearOverrunCount(void)
 {
-    vTaskSch_info.total_overRun_count = 0;
+    vTaskSch_info.overRun_count = 0;
 }
 
 static inline void tasksch_checkOverrunThreshold(void)
 {
 #if (TASKSCH_OVERRUN_DETECT == TASKSCH_OVERRUN_DETECT_ENABLE)
-    if (vTaskSch_info.total_overRun_count >= TASKSCH_OVERRUN_THRESHOLD_CNT)
+    if (vTaskSch_info.overRun_count >= TASKSCH_OVERRUN_THRESHOLD_CNT)
     {
         vTaskSch_info.runErrCode = TASKSCH_RUN_ERR_OVERRUN_CNT_EXCEEDED;
 #if (TASKSCH_OVERRUN_HOOK == TASKSCH_OVERRUN_HOOK_ENABLE)
@@ -301,7 +300,7 @@ static inline void tasksch_detectOverRun(typTaskInfo *task)
 
     if (task->exec_flag == true)
     {
-        task->indiOverRunCnt++;
+        task->indiOverRun_cycleCnt++;
     }
 
 #endif
@@ -322,8 +321,7 @@ static void tasksch_infoInit(void)
     vTaskSch_info.tasksch_Exit_Flag = false;
     vTaskSch_info.majorCycle_taskExecCnt = 0;
     vTaskSch_info.majorCycle_flag = false;
-    vTaskSch_info.oneCycle_overRun_count = 0;
-    vTaskSch_info.total_overRun_count = 0;
+    vTaskSch_info.overRun_count = 0;
 }
 
 void tasksch_init(void)
