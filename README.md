@@ -2,6 +2,9 @@
 
 This project is a **non-preemptive, period-based scheduler for ST microcontrollers**, designed with a primary focus on **predictability and system safety**.
 
+If you would like to know more about this scheduler, please visit the '[site](https://velog.io/@smersh/%EB%B9%84%EC%84%A0%EC%A0%90%ED%98%95-%EC%8A%A4%EC%BC%80%EC%A4%84%EB%9F%AC-%E6%94%B9)'.
+(Written in Korean)
+
 Rather than simply executing tasks at fixed intervals, the scheduler is intended to **detect, diagnose, and respond to delays and exceptional conditions** that commonly arise in real-time embedded systems.
 
 The core philosophy of this scheduler is not to eliminate all timing violations, but to **make such violations observable, traceable, and recoverable**.
