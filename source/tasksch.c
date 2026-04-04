@@ -57,7 +57,7 @@ static typSchInfo vTaskSch_info;
 
 /* Task Scheduler - RunTime Assert */
 
-static bool tasksch_feedWatchdog(void);
+bool tasksch_feedWatchdog(void);
 
 static inline void tasksch_runTime_assertFunc(void)
 {

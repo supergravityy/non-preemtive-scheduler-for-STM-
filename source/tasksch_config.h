@@ -18,7 +18,7 @@
 
 // todo : By using "__weak", it is assumed that i'm using stm32.
 
-//extern TIM_HandleTypeDef htim1;                                           // INFO : USER MUST DEFINE
+//extern TIM_HandleTypeDef htim1;                                           // INFO : USER DEFINE OR USE SYSTICK
 
 /*---- REQUIRED SETTING LIST ----*/
 

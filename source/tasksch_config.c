@@ -19,7 +19,7 @@
 #if (TASKSCH_TASK_WATCHDOG == TASKSCH_WATCHDOG_ENABLE)
 #ifdef TASKSCH_STM32_HAL_USE
 
-static IWDG_HandleTypeDef hiwdg; // IWDG handle in STM32 HAL
+extern IWDG_HandleTypeDef hiwdg; // IWDG handle in STM32 HAL
 
 #endif
 #endif
