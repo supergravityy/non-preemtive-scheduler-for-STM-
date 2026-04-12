@@ -152,7 +152,7 @@ voidtasksch_init_RegiTaskObj(void)
 
 ## c. Timer Interrupt Integration
 
-Call the scheduler time manager from a 1 ms timer ISR.
+Call the scheduler time manager from a 1 ms timer ISR or sysTick Handler
 
 ```c
 voidTIM1_UP_IRQHandler(void)
